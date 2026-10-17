@@ -1,8 +1,7 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
-  createRootRouteWithContext,
+  createRootRoute,
   useRouter,
   HeadContent,
   Scripts,
@@ -14,7 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/imune/Logo";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-
+import { DemoProvider } from "@/lib/imune/demo-context";
 
 function NotFoundComponent() {
   return (
@@ -22,18 +21,21 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <Logo className="mx-auto h-14" />
         <p className="mt-10 font-display text-8xl font-semibold text-primary/20">404</p>
-        <h1 className="mt-2 text-3xl font-semibold text-foreground">Essa página saiu para passear</h1>
+        <h1 className="mt-2 text-3xl font-semibold text-foreground">
+          Essa página saiu para passear
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Não encontramos o caminho que você tentou acessar.
         </p>
         <div className="mt-6">
-          <Button asChild><Link to="/">Voltar ao início</Link></Button>
+          <Button asChild>
+            <Link to="/">Voltar ao início</Link>
+          </Button>
         </div>
       </div>
     </div>
   );
 }
-
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
@@ -60,15 +62,16 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           >
             Tentar novamente
           </Button>
-          <Button asChild variant="outline"><a href="/">Voltar ao início</a></Button>
+          <Button asChild variant="outline">
+            <a href="/">Voltar ao início</a>
+          </Button>
         </div>
       </div>
     </div>
   );
-
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -96,7 +99,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap",
+      },
     ],
   }),
 
@@ -121,14 +127,10 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+    <DemoProvider>
       <Outlet />
       <Toaster position="top-right" richColors />
-    </QueryClientProvider>
+    </DemoProvider>
   );
 }
-

@@ -65,7 +65,3 @@ export function birthYearOptions(): number[] {
   if (current < earliest) return [];
   return Array.from({ length: current - earliest + 1 }, (_, i) => current - i);
 }
-
-export const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
-export const PHOTO_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-export const PHOTO_BUCKET = "pet-photos";

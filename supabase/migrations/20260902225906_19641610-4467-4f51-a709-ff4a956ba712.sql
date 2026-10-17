@@ -1,4 +1,3 @@
--- profiles
 CREATE TABLE public.profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   name text NOT NULL,
@@ -21,7 +20,6 @@ CREATE POLICY "Users can insert own profile"
 CREATE POLICY "Users can update own profile"
   ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
--- pets
 CREATE TABLE public.pets (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -66,7 +64,6 @@ CREATE POLICY "Author can update pet"
 CREATE POLICY "Author can delete pet"
   ON public.pets FOR DELETE TO authenticated USING (auth.uid() = owner_id);
 
--- vaccinations
 CREATE TABLE public.vaccinations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   pet_id uuid NOT NULL REFERENCES public.pets(id) ON DELETE CASCADE,
@@ -108,7 +105,6 @@ CREATE INDEX pets_owner_id_idx ON public.pets(owner_id);
 CREATE INDEX pets_co_author_id_idx ON public.pets(co_author_id);
 CREATE INDEX vaccinations_pet_id_idx ON public.vaccinations(pet_id);
 
--- timestamps trigger
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -126,7 +122,6 @@ FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER update_vaccinations_updated_at BEFORE UPDATE ON public.vaccinations
 FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- profile auto-creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql

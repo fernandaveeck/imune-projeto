@@ -16,7 +16,6 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthenticatedPetsIndexRouteImport } from './routes/_authenticated/pets/index'
 import { Route as AuthenticatedPetsNewRouteImport } from './routes/_authenticated/pets/new'
 import { Route as AuthenticatedPetsIdIndexRouteImport } from './routes/_authenticated/pets/$id.index'
-import { Route as AuthenticatedPetsIdEditRouteImport } from './routes/_authenticated/pets/$id.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -53,11 +52,6 @@ const AuthenticatedPetsIdIndexRoute =
     path: '/pets/$id/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedPetsIdEditRoute = AuthenticatedPetsIdEditRouteImport.update({
-  id: '/pets/$id/edit',
-  path: '/pets/$id/edit',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -65,7 +59,6 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/pets/new': typeof AuthenticatedPetsNewRoute
   '/pets/': typeof AuthenticatedPetsIndexRoute
-  '/pets/$id/edit': typeof AuthenticatedPetsIdEditRoute
   '/pets/$id/': typeof AuthenticatedPetsIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -74,7 +67,6 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/pets/new': typeof AuthenticatedPetsNewRoute
   '/pets': typeof AuthenticatedPetsIndexRoute
-  '/pets/$id/edit': typeof AuthenticatedPetsIdEditRoute
   '/pets/$id': typeof AuthenticatedPetsIdIndexRoute
 }
 export interface FileRoutesById {
@@ -85,28 +77,14 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_authenticated/pets/new': typeof AuthenticatedPetsNewRoute
   '/_authenticated/pets/': typeof AuthenticatedPetsIndexRoute
-  '/_authenticated/pets/$id/edit': typeof AuthenticatedPetsIdEditRoute
   '/_authenticated/pets/$id/': typeof AuthenticatedPetsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/login'
-    | '/register'
-    | '/pets/new'
-    | '/pets/'
-    | '/pets/$id/edit'
-    | '/pets/$id/'
+    '/' | '/login' | '/register' | '/pets/new' | '/pets/' | '/pets/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/login'
-    | '/register'
-    | '/pets/new'
-    | '/pets'
-    | '/pets/$id/edit'
-    | '/pets/$id'
+  to: '/' | '/login' | '/register' | '/pets/new' | '/pets' | '/pets/$id'
   id:
     | '__root__'
     | '/'
@@ -115,7 +93,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/_authenticated/pets/new'
     | '/_authenticated/pets/'
-    | '/_authenticated/pets/$id/edit'
     | '/_authenticated/pets/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -177,27 +154,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPetsIdIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/pets/$id/edit': {
-      id: '/_authenticated/pets/$id/edit'
-      path: '/pets/$id/edit'
-      fullPath: '/pets/$id/edit'
-      preLoaderRoute: typeof AuthenticatedPetsIdEditRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPetsNewRoute: typeof AuthenticatedPetsNewRoute
   AuthenticatedPetsIndexRoute: typeof AuthenticatedPetsIndexRoute
-  AuthenticatedPetsIdEditRoute: typeof AuthenticatedPetsIdEditRoute
   AuthenticatedPetsIdIndexRoute: typeof AuthenticatedPetsIdIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPetsNewRoute: AuthenticatedPetsNewRoute,
   AuthenticatedPetsIndexRoute: AuthenticatedPetsIndexRoute,
-  AuthenticatedPetsIdEditRoute: AuthenticatedPetsIdEditRoute,
   AuthenticatedPetsIdIndexRoute: AuthenticatedPetsIdIndexRoute,
 }
 

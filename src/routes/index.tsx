@@ -1,5 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Bell, CalendarCheck2, FileDown, Heart, PawPrint, Users } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarCheck2,
+  CalendarDays,
+  ClipboardList,
+  Heart,
+  PawPrint,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/imune/Logo";
 import petDetailImage from "@/assets/pet-detail desktop.png";
@@ -64,8 +71,8 @@ function LandingPage() {
               Entrar
             </Link>
             <Button asChild size="sm" className="landing-header-cta">
-              <Link to="/register">
-                Criar conta <ArrowRight aria-hidden="true" />
+              <Link to="/login">
+                Explorar demo <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
           </div>
@@ -88,8 +95,8 @@ function LandingPage() {
               </p>
               <div className="landing-hero-actions landing-appear landing-delay-3">
                 <Button asChild size="lg">
-                  <Link to="/register">
-                    Começar a cuidar <ArrowRight aria-hidden="true" />
+                  <Link to="/login">
+                    Explorar demonstração <ArrowRight aria-hidden="true" />
                   </Link>
                 </Button>
                 <a href="#como-funciona" className="landing-text-link">
@@ -191,8 +198,8 @@ function LandingPage() {
                 <h2 id="pets-title">Um cantinho para cada pet da casa.</h2>
               </div>
               <p>
-                Encontre os perfis dos seus companheiros, veja o que vem pela frente e compartilhe o
-                acompanhamento com quem cuida junto.
+                Encontre os perfis dos seus companheiros e veja as próximas doses em uma visão clara
+                de cada pet.
               </p>
             </div>
             <figure className="landing-pets-image">
@@ -204,16 +211,16 @@ function LandingPage() {
             </figure>
             <div className="landing-benefits">
               <div>
-                <Bell aria-hidden="true" />
-                <span>Notificações de vacinas próximas</span>
+                <PawPrint aria-hidden="true" />
+                <span>Perfis para seus pets</span>
               </div>
               <div>
-                <Users aria-hidden="true" />
-                <span>Acompanhamento com cotitulares</span>
+                <CalendarDays aria-hidden="true" />
+                <span>Próximas aplicações à vista</span>
               </div>
               <div>
-                <FileDown aria-hidden="true" />
-                <span>Histórico do pet em PDF</span>
+                <ClipboardList aria-hidden="true" />
+                <span>Histórico de vacinação</span>
               </div>
             </div>
           </div>
@@ -229,11 +236,11 @@ function LandingPage() {
             <p>Crie o perfil do seu pet e mantenha a história de vacinação sempre à mão.</p>
             <div className="landing-final-actions">
               <Button asChild size="lg" variant="secondary">
-                <Link to="/register">
-                  Criar minha conta <ArrowRight aria-hidden="true" />
+                <Link to="/login">
+                  Entrar como convidado <ArrowRight aria-hidden="true" />
                 </Link>
               </Button>
-              <Link to="/login">Já tenho conta</Link>
+              <a href="#como-funciona">Ver como funciona</a>
             </div>
           </div>
         </section>

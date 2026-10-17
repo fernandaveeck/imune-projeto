@@ -6,12 +6,7 @@ import { IMaskMixin } from "react-imask";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverAnchor,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const DISPLAY_DATE_FORMAT = "dd/MM/yyyy";
 const DISPLAY_DATE_PARSE_FORMAT = "d/M/yyyy";
@@ -23,7 +18,7 @@ const MaskedDateInput = IMaskMixin<HTMLInputElement>(({ inputRef, ...props }) =>
 
 interface DatePickerProps {
   id: string;
-  value: string; // "yyyy-MM-dd" ou ""
+  value: string;
   onChange: (value: string) => void;
   onValidationError?: (message?: string) => void;
   placeholder?: string;
@@ -42,7 +37,9 @@ function parseDisplayDate(value: string): Date | undefined {
 
   if (!match) return undefined;
 
-  const [, day, month, year] = match;
+  const day = match[1] ?? "";
+  const month = match[2] ?? "";
+  const year = match[3] ?? "";
   const normalizedDate = `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
   const parsed = parse(normalizedDate, DISPLAY_DATE_PARSE_FORMAT, new Date());
 
@@ -189,7 +186,7 @@ export function DatePicker({
             disabled={disabled}
             placeholder={placeholder}
             value={inputValue}
-            onAccept={(maskedValue) => handleInputChange(String(maskedValue))}
+            onAccept={(maskedValue: string) => handleInputChange(maskedValue)}
             onBlur={handleBlur}
             aria-invalid={aria["aria-invalid"]}
             aria-describedby={aria["aria-describedby"]}

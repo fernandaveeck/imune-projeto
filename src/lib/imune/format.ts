@@ -32,7 +32,6 @@ export function sexLabel(sex: string): string {
   return sex === "femea" ? "Fêmea" : "Macho";
 }
 
-/** Idade calculada apenas na interface — nunca persistida. */
 export function ageLabel(birthDate: string | null, approxYear: number | null): string {
   if (birthDate) {
     const birth = parseDateOnly(birthDate);
