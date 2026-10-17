@@ -168,7 +168,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_view_profile: {
+        Args: { target_profile_id: string }
+        Returns: boolean
+      }
+      find_profile_id_by_email: {
+        Args: { lookup_email: string }
+        Returns: string | null
+      }
     }
     Enums: {
       [_ in never]: never

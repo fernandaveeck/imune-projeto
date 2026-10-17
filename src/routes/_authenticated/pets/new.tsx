@@ -50,7 +50,6 @@ function NewPetPage() {
         Preencha os dados do pet e registre as vacinas já aplicadas.
       </p>
       <PetForm
-        userId={profile?.id ?? ""}
         submitting={submitting}
         submitLabel="Cadastrar pet"
         onSubmit={handleSubmit}

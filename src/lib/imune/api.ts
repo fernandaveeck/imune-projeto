@@ -29,14 +29,12 @@ export async function getMyProfile(): Promise<Profile | null> {
   return data ?? { id: user.id, name: user.email ?? "", email: user.email ?? "" };
 }
 
-export async function listProfiles(excludeId: string): Promise<Profile[]> {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, name, email")
-    .neq("id", excludeId)
-    .order("name");
+export async function findProfileIdByEmail(email: string): Promise<string | null> {
+  const { data, error } = await supabase.rpc("find_profile_id_by_email", {
+    lookup_email: email.trim().toLowerCase(),
+  });
   if (error) throw error;
-  return data ?? [];
+  return data ?? null;
 }
 
 export async function listPets(

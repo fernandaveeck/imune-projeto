@@ -93,7 +93,6 @@ function EditPetPage() {
       </p>
       <PetForm
         pet={pet}
-        userId={profile.id}
         submitting={submitting}
         submitLabel="Salvar alterações"
         onSubmit={handleSubmit}

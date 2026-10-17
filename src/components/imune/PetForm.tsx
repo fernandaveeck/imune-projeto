@@ -1,10 +1,9 @@
 import { useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import {
   ArrowLeft,
-  Check,
-  ChevronDown,
   HeartHandshake,
   ImagePlus,
   Plus,
@@ -12,6 +11,7 @@ import {
   Syringe,
   Trash2,
   Upload,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,15 +25,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DatePicker } from "@/components/imune/DatePicker";
 import {
   breedsForSpecies,
@@ -43,7 +34,7 @@ import {
   SEXES,
   SPECIES,
 } from "@/lib/imune/constants";
-import { listProfiles, getPhotoUrl } from "@/lib/imune/api";
+import { findProfileIdByEmail, getPhotoUrl } from "@/lib/imune/api";
 import type { PetInput, PetWithRelations, VaccineInput } from "@/lib/imune/types";
 
 export interface PetFormSubmit {
@@ -78,14 +69,12 @@ function emptyVaccine(): VaccineRow {
 
 export function PetForm({
   pet,
-  userId,
   submitting,
   submitLabel,
   onSubmit,
   onCancel,
 }: {
   pet?: PetWithRelations;
-  userId: string;
   submitting: boolean;
   submitLabel: string;
   onSubmit: (data: PetFormSubmit) => void;
@@ -109,10 +98,11 @@ export function PetForm({
   );
   const [weight, setWeight] = useState(pet ? String(pet.weight) : "");
   const [sex, setSex] = useState(pet?.sex ?? "");
-  const [cotitularIds, setCotitularIds] = useState(
-    pet?.cotitulares.map((cotitular) => cotitular.id) ?? [],
+  const [cotitulares, setCotitulares] = useState(
+    () => pet?.cotitulares.map(({ id, email }) => ({ id, email })) ?? [],
   );
-  const [cotitularesOpen, setCotitularesOpen] = useState(false);
+  const [cotitularEmail, setCotitularEmail] = useState("");
+  const [addingCotitular, setAddingCotitular] = useState(false);
   const [notes, setNotes] = useState(pet?.notes ?? "");
   const [vaccines, setVaccines] = useState<VaccineRow[]>(
     pet?.vaccinations.length
@@ -134,24 +124,38 @@ export function PetForm({
     enabled: Boolean(pet?.photo_path),
   });
 
-  const profiles = useQuery({
-    queryKey: ["profiles", userId],
-    queryFn: () => listProfiles(userId),
-    enabled: Boolean(userId),
-  });
-
   const breeds = useMemo(() => breedsForSpecies(species), [species]);
   const years = useMemo(() => birthYearOptions(), []);
   const previewSrc = photoPreview ?? existingPhoto.data ?? null;
-  const selectedCotitulares = (profiles.data ?? []).filter((profile) =>
-    cotitularIds.includes(profile.id),
-  );
-  const cotitularLabel =
-    cotitularIds.length === 0
-      ? "Nenhum cotitular"
-      : cotitularIds.length === 1
-        ? (selectedCotitulares[0]?.name ?? "1 cotitular selecionado")
-        : `${cotitularIds.length} cotitulares selecionados`;
+
+  async function addCotitular() {
+    const email = cotitularEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Informe um email válido para adicionar o cotitular.");
+      return;
+    }
+
+    setAddingCotitular(true);
+    try {
+      const profileId = await findProfileIdByEmail(email);
+      if (!profileId) {
+        toast.error("Nenhum usuário com esse email foi encontrado na aplicação.");
+        return;
+      }
+      if (cotitulares.some((cotitular) => cotitular.id === profileId)) {
+        toast.error("Esse email já foi adicionado como cotitular.");
+        return;
+      }
+
+      setCotitulares((current) => [...current, { id: profileId, email }]);
+      setCotitularEmail("");
+      toast.success("Cotitular adicionado com sucesso.");
+    } catch {
+      toast.error("Não foi possível verificar esse email. Tente novamente.");
+    } finally {
+      setAddingCotitular(false);
+    }
+  }
 
   function handlePhotoChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -296,7 +300,7 @@ export function PetForm({
         approx_birth_year: birthType === "approx" ? Number(birthYear) : null,
         weight: Number(weight.replace(",", ".")),
         sex,
-        cotitular_ids: cotitularIds,
+        cotitular_ids: cotitulares.map(({ id }) => id),
         notes: notes.trim() ? notes.trim() : null,
       },
       vaccines: vaccines.map((v) => ({
@@ -603,82 +607,64 @@ export function PetForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="pet-cotitulares">Cotitulares (opcional)</Label>
-          <Popover open={cotitularesOpen} onOpenChange={setCotitularesOpen}>
-            <PopoverTrigger asChild>
-              <button
-                id="pet-cotitulares"
-                type="button"
-                role="combobox"
-                aria-haspopup="listbox"
-                aria-expanded={cotitularesOpen}
-                aria-label="Selecionar cotitulares"
-                className="flex h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-input bg-card px-4 py-2 text-left text-sm transition-[border-color,box-shadow,background-color] hover:border-primary/25 focus:border-primary focus:outline-none focus:ring-4 focus:ring-ring/12"
-              >
-                <span className="truncate text-foreground">{cotitularLabel}</span>
-                <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="start"
-              className="w-[var(--radix-popover-trigger-width)] overflow-hidden p-0 shadow-card"
+          <Label htmlFor="pet-cotitular-email">Adicionar cotitular pelo email (opcional)</Label>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Input
+              id="pet-cotitular-email"
+              type="email"
+              inputMode="email"
+              autoComplete="off"
+              placeholder="email@exemplo.com"
+              value={cotitularEmail}
+              onChange={(event) => setCotitularEmail(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  void addCotitular();
+                }
+              }}
+              disabled={addingCotitular}
+            />
+            <Button
+              type="button"
+              onClick={() => void addCotitular()}
+              disabled={addingCotitular || !cotitularEmail.trim()}
+              className="sm:min-w-32"
             >
-              <Command>
-                <CommandInput placeholder="Buscar por nome ou e-mail..." />
-                <CommandList>
-                  <CommandEmpty>
-                    {profiles.isPending ? "Carregando usuários..." : "Nenhum usuário encontrado."}
-                  </CommandEmpty>
-                  <CommandGroup>
-                    <CommandItem
-                      value="Nenhum cotitular"
-                      onSelect={() => {
-                        setCotitularIds([]);
-                        setCotitularesOpen(false);
-                      }}
-                      className="min-h-14 cursor-pointer items-center py-2 pl-3 pr-3"
-                    >
-                      <span className="flex-1">Nenhum cotitular</span>
-                      <Check
-                        className={`h-4 w-4 ${cotitularIds.length === 0 ? "opacity-100" : "opacity-0"}`}
-                      />
-                    </CommandItem>
-                    {profiles.isPending ? (
-                      <p className="px-3 py-2 text-xs text-muted-foreground">
-                        Carregando usuários...
-                      </p>
-                    ) : null}
-                    {(profiles.data ?? []).map((profile) => {
-                      return (
-                        <CommandItem
-                          key={profile.id}
-                          value={`${profile.name} ${profile.email}`}
-                          onSelect={() =>
-                            setCotitularIds((current) =>
-                              current.includes(profile.id)
-                                ? current.filter((id) => id !== profile.id)
-                                : [...current, profile.id],
-                            )
-                          }
-                          className="min-h-14 cursor-pointer items-center py-2 pl-3 pr-3"
-                        >
-                          <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
-                            <span className="max-w-full truncate">{profile.name}</span>
-                            <span className="max-w-full truncate text-xs opacity-60">
-                              {profile.email}
-                            </span>
-                          </span>
-                          <Check
-                            className={`h-4 w-4 ${cotitularIds.includes(profile.id) ? "opacity-100" : "opacity-0"}`}
-                          />
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+              <Plus className="h-4 w-4" />
+              {addingCotitular ? "Verificando..." : "Adicionar"}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Informe o email que a pessoa usa para acessar o Imune.
+          </p>
+          {cotitulares.length > 0 ? (
+            <ul className="space-y-2 pt-1" aria-label="Cotitulares adicionados" aria-live="polite">
+              {cotitulares.map((cotitular) => (
+                <li
+                  key={cotitular.id}
+                  className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-secondary/25 px-3 py-1.5"
+                >
+                  <span className="min-w-0 truncate text-sm text-foreground">{cotitular.email}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    aria-label={`Remover ${cotitular.email} da lista de cotitulares`}
+                    onClick={() =>
+                      setCotitulares((current) =>
+                        current.filter((item) => item.id !== cotitular.id),
+                      )
+                    }
+                    disabled={submitting}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-primary" />
             Cotitulares acompanham o pet. Somente o titular pode editar ou excluir.
