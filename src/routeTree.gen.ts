@@ -1,0 +1,215 @@
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as AuthenticatedPetsIndexRouteImport } from './routes/_authenticated/pets/index'
+import { Route as AuthenticatedPetsNewRouteImport } from './routes/_authenticated/pets/new'
+import { Route as AuthenticatedPetsIdIndexRouteImport } from './routes/_authenticated/pets/$id.index'
+import { Route as AuthenticatedPetsIdEditRouteImport } from './routes/_authenticated/pets/$id.edit'
+
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPetsIndexRoute = AuthenticatedPetsIndexRouteImport.update({
+  id: '/pets/',
+  path: '/pets/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPetsNewRoute = AuthenticatedPetsNewRouteImport.update({
+  id: '/pets/new',
+  path: '/pets/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPetsIdIndexRoute =
+  AuthenticatedPetsIdIndexRouteImport.update({
+    id: '/pets/$id/',
+    path: '/pets/$id/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPetsIdEditRoute = AuthenticatedPetsIdEditRouteImport.update({
+  id: '/pets/$id/edit',
+  path: '/pets/$id/edit',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/pets/new': typeof AuthenticatedPetsNewRoute
+  '/pets/': typeof AuthenticatedPetsIndexRoute
+  '/pets/$id/edit': typeof AuthenticatedPetsIdEditRoute
+  '/pets/$id/': typeof AuthenticatedPetsIdIndexRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/pets/new': typeof AuthenticatedPetsNewRoute
+  '/pets': typeof AuthenticatedPetsIndexRoute
+  '/pets/$id/edit': typeof AuthenticatedPetsIdEditRoute
+  '/pets/$id': typeof AuthenticatedPetsIdIndexRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/_authenticated/pets/new': typeof AuthenticatedPetsNewRoute
+  '/_authenticated/pets/': typeof AuthenticatedPetsIndexRoute
+  '/_authenticated/pets/$id/edit': typeof AuthenticatedPetsIdEditRoute
+  '/_authenticated/pets/$id/': typeof AuthenticatedPetsIdIndexRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/pets/new'
+    | '/pets/'
+    | '/pets/$id/edit'
+    | '/pets/$id/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/pets/new'
+    | '/pets'
+    | '/pets/$id/edit'
+    | '/pets/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/register'
+    | '/_authenticated/pets/new'
+    | '/_authenticated/pets/'
+    | '/_authenticated/pets/$id/edit'
+    | '/_authenticated/pets/$id/'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/pets/': {
+      id: '/_authenticated/pets/'
+      path: '/pets'
+      fullPath: '/pets/'
+      preLoaderRoute: typeof AuthenticatedPetsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pets/new': {
+      id: '/_authenticated/pets/new'
+      path: '/pets/new'
+      fullPath: '/pets/new'
+      preLoaderRoute: typeof AuthenticatedPetsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pets/$id/': {
+      id: '/_authenticated/pets/$id/'
+      path: '/pets/$id'
+      fullPath: '/pets/$id/'
+      preLoaderRoute: typeof AuthenticatedPetsIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pets/$id/edit': {
+      id: '/_authenticated/pets/$id/edit'
+      path: '/pets/$id/edit'
+      fullPath: '/pets/$id/edit'
+      preLoaderRoute: typeof AuthenticatedPetsIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+  }
+}
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPetsNewRoute: typeof AuthenticatedPetsNewRoute
+  AuthenticatedPetsIndexRoute: typeof AuthenticatedPetsIndexRoute
+  AuthenticatedPetsIdEditRoute: typeof AuthenticatedPetsIdEditRoute
+  AuthenticatedPetsIdIndexRoute: typeof AuthenticatedPetsIdIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPetsNewRoute: AuthenticatedPetsNewRoute,
+  AuthenticatedPetsIndexRoute: AuthenticatedPetsIndexRoute,
+  AuthenticatedPetsIdEditRoute: AuthenticatedPetsIdEditRoute,
+  AuthenticatedPetsIdIndexRoute: AuthenticatedPetsIdIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
+}
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
